@@ -11,36 +11,39 @@ export class TutoringController {
   constructor(private readonly tutoringService: TutoringService) {}
 
 
-  @Post("/uploads")
+  @Post("/uploads/:id")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File,@Res() res : Response,@Req() req : Request,@Body() createTutoringDto : CreateTutoringDto) {
-  await this.tutoringService.uploads(file,createTutoringDto,req,res);
-
+  async uploadFile(@UploadedFile() file: Express.Multer.File,@Res() res : Response,@Req() req : Request,@Param("id") id : string) {
+  await this.tutoringService.uploads(file,req,res,id);
   }
 
   @Post("/create")
-  create(@Body() createTutoringDto: CreateTutoringDto) {
-    return this.tutoringService.create(createTutoringDto);
+  create(@Body() createTutoringDto : CreateTutoringDto,@Res() res : Response,@Req() req : Request){
+    return this.tutoringService.create(createTutoringDto,req,res)
   }
 
-  @Get()
-  findAll() {
-    return this.tutoringService.findAll();
+  @Get("/findall")
+  findAll(@Res() res : Response,@Req() req : Request) {
+    return this.tutoringService.findAll(req,res);
   }
 
+  @Get("/findmy")
+  findmy(@Res() res : Response,@Req() req : Request) {
+    return this.tutoringService.findMy(req,res);
+  }
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tutoringService.findOne(+id);
+  findOne(@Param('id') id: string,@Res() res : Response,@Req() req : Request) {
+    return this.tutoringService.findOne(id,req,res);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTutoringDto: UpdateTutoringDto) {
-    return this.tutoringService.update(+id, updateTutoringDto);
+  update(@Param('id') id: string, @Body() updateTutoringDto: UpdateTutoringDto,@Res() res : Response,@Req() req : Request) {
+    return this.tutoringService.update(id,updateTutoringDto,req,res);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tutoringService.remove(+id);
+  remove(@Param('id') id: string,@Res() res : Response,@Req() req : Request) {
+    return this.tutoringService.remove(id,req,res);
   }
 }

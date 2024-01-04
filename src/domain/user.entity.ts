@@ -1,7 +1,9 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Tutoring } from "./tutoring.entity";
 import { Academy } from "./academy.entity";
 import { Review } from "./review.entity";
+import { Chat } from "./chat.entity";
+import { Room } from "./room.entity";
 
 @Entity({schema : "cst", name : "user"})
 export class User {
@@ -40,4 +42,12 @@ export class User {
 
   @OneToMany(()=>Review,(review)=>review.userId,{cascade : true})
   review : Review | string
+  
+  @OneToMany(()=>Chat,(chat)=>chat.senduserId,)
+  send : Chat | string
+
+  @OneToMany(()=>Chat,(chat)=>chat.receiveuserId,)
+  receive : Chat | string
+
+
 }

@@ -7,7 +7,8 @@ import { Mail } from 'src/domain/mail.entity';
 import { LessThan, Repository } from 'typeorm';
 import { Interval,Timeout,Cron } from '@nestjs/schedule';
 import { CheckMailDto } from './dto/check-mail.dto';
-
+import {Request,Response} from 'express'
+import { escape } from 'querystring';
 @Injectable()
 export class MailService {
   constructor(
@@ -71,22 +72,28 @@ export class MailService {
     return {remove : true}
   }
 
-  async mailcheck(checkMailDto : CheckMailDto){
-    const {email,token} = checkMailDto
-    const currentDate = new Date();
-    const newDate = new Date(currentDate.getTime() + 10 * 60 * 1000);
-    if(await this.findOne(email)==false){
-      return {success : "인증번호부터보내주세요"}
+  async mailcheck(checkMailDto : CheckMailDto,req : Request, res : Response){
+    try{
+      const {email,token} = checkMailDto
+      const currentDate = new Date();
+      const newDate = new Date(currentDate.getTime() + 10 * 60 * 1000);
+      if(await this.findOne(email)==false){
+        throw ({message : "인증번호부터보내주세요", status : 404})
+      }
+      const data = await this.mail.findOne({where : {email}})
+      if(data.token != token){
+        throw ({message : "인증번호가맞지않ㅇㅁ", status : 401})
+      }
+      data.isVerified = true
+      data.expiresAt = newDate
+      await this.mail.save(data)
+      //return {success : true}
+      return res.status(200).json({message : "완료"})
+    }catch(error){
+      console.log(error)
+      return res.status(error.status).json({message : error.message})
     }
-    const data = await this.mail.findOne({where : {email}})
-    console.log(data.token,"토큰입니다")
-    if(data.token != token){
-      return {success : "인증번호가 맞지 않습니다"}
-    }
-    data.isVerified = true
-    data.expiresAt = newDate
-    await this.mail.save(data)
-    return {success : true}
+
   }
 
   async getMail(email : string){

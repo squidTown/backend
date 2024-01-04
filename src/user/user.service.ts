@@ -18,7 +18,7 @@ export class UserService {
     private authService : AuthService
   ){}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto,req : Request, res : Response) {
     console.log("adljkf")
     const {email,name} = createUserDto
     const data = await this.mail.getMail(email)
@@ -26,17 +26,17 @@ export class UserService {
     //createUserDto.userId = random5Digit
 
     if(await this.user.findOne({where : {name}})){
-      return { success : "이름중복"}
+      return res.status(401).json({message : "이름중복"})
     }else if(await this.user.findOne({where : {email}})){
-      return { success : "이메일중복"}
+      return res.status(401).json({message : "이메일중복"})
     }
 
     if(!data||data.isVerified==false){
-      return { success : "이메일 인증부터"}
+      return res.status(401).json({message : "인증부터"})
     }
     await this.mail.remove(data.email)
     await this.user.save(createUserDto)
-    return { success : true}
+    return res.status(200).json({message : "ok"})
   }
 
   async findOne(userId: string) {
@@ -101,17 +101,17 @@ export class UserService {
     return data
   }
 
-  async remove(req : Request) {
+  async remove(req : Request,res : Response) {
     const token = this.getToken(req)
     const verify = await this.authService.verify(token)
     const {email} = verify
     const data = await this.user.findOne({where : {email}})
 
     if(!data){
-      return {success : "회원정보를 찾을수 없음"}
+      return res.status(401).json({message : "회원정보를찾을수없음"})
     }   
 
     await this.user.remove(data)
-    return {success : true}
+    return res.status(200).json({message : "ok"})
   }
 }

@@ -10,8 +10,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post("/create")//회원가입
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  create(@Body() createUserDto: CreateUserDto,@Req() req : Request, @Res() res : Response) {
+    return this.userService.create(createUserDto,req,res);
   }
 
   @Post("/findpassword")
@@ -25,22 +25,17 @@ export class UserController {
     console.log("네 요청 받았습니단")
     const data = await this.userService.mypage(req);
     res.send( {data : data, success  : true})
-  }
-
-  @Get("/findall")
-  findall(){
-  }
-  
+  }  
 
   @Patch(':id')//정보수정
   @UseGuards(JwtAuthGuard)
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Req() req : Request) {
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Req() req : Request,@Res() res : Response) {
     return this.userService.update(id, updateUserDto,req);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string, @Req() req : Request) {
-    return this.userService.remove(req);
+  remove(@Param('id') id: string, @Req() req : Request,@Res() res : Response) {
+    return this.userService.remove(req,res);
   }
 }

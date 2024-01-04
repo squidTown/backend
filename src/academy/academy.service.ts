@@ -9,6 +9,7 @@ import { Request, Response } from 'express';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
+import { User } from 'src/domain/user.entity';
 
 @Injectable()
 export class AcademyService {
@@ -16,7 +17,9 @@ export class AcademyService {
   constructor(
     @InjectRepository(Academy)
     private academy : Repository<Academy>,
-    private authService : AuthService
+    private authService : AuthService,
+    @InjectRepository(User)
+    private user : Repository<User>,
   ){}
 
   async create(createAcademyDto: CreateAcademyDto, req : Request, res : Response) {
@@ -27,7 +30,7 @@ export class AcademyService {
       createAcademyDto.userId = verify.uuid
       await this.academy.save(createAcademyDto)
       return res.status(200).json({
-        message : "완료"
+        message : "완료",
       })
     }catch(error){
       console.log(error)
@@ -148,6 +151,52 @@ export class AcademyService {
       if(error.status = 401){
         return res.status(401).json({message : error.message})
       }
+      return res.status(500).json({message : "ise"})
+    }
+  }
+
+  async findmy(req : Request, res : Response){
+    const verify = await this.authService.verify2(req)
+    try{
+      const data = await this.academy.find({where : {userId : verify.uuid},select : ["academyId","academyName","address"]})
+      return res.status(200).json({message : "ok", data : data})
+    }catch(error){
+      console.log(error)
+      return res.status(500).json({message : "ise"})
+    }
+  }
+
+  async findAcademiesWithinRadius(req : Request, res : Response) {
+    try{
+    const verify = await this.authService.verify2(req)
+    const userData = await this.user.findOne({where : {userId : verify.uuid}})
+    const radius = 2;
+    const lat = userData.let//34.1232
+    const lon = userData.lnt//35.3091
+    const academiesWithinRadius = await this.academy
+      .createQueryBuilder('academy')
+      .select([
+        'academy.academyName',
+        'academy.name',
+        'academy.Personnel',
+        'academy.subject',
+        'academy.purpose',
+        'academy.academyPrice',
+        'academy.address',
+        'academy.Latitude',
+        'academy.longitude',
+        'academy.academyInfo',
+        'academy.sns',
+        'academy.img',  
+        'academy.academyId',  // Use academyId instead of id
+        `(6371 * acos(cos(radians(:lat)) * cos(radians(academy.Latitude)) * cos(radians(academy.longitude) - radians(:lon)) + sin(radians(:lat)) * sin(radians(academy.Latitude)))) AS distance`
+      ])
+      .having('distance <= :radius')
+      .setParameters({ lat, lon, radius })
+      .getRawMany();
+      return res.status(200).json({data : academiesWithinRadius})
+    }catch(error){
+      console.log(error)
       return res.status(500).json({message : "ise"})
     }
   }

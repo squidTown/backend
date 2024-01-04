@@ -23,7 +23,7 @@ export class AuthService {
     const login = {email : email, roles : "user", uuid : find.userId, name : find.name}//수정됨
     try{
       const token = this.jwtService.sign(login)
-      return {success : true,token : token }
+      return {success : true,token : token, name : find.name}
     }catch{
       throw new UnauthorizedException("로그인실패입니다..")
     }
@@ -49,10 +49,15 @@ export class AuthService {
   async verify2(req : Request){
     try{
       const token = this.getToken(req)
+
       if(!token){
          throw new UnauthorizedException("만료된거나 없는토큰")
       }
       const verify = await this.jwtService.verifyAsync(token,{secret : "secret"})
+      const userData = await this.user.findOne({where : {userId : verify.uuid}})
+      if(!userData){
+        throw new UnauthorizedException("만료된거나 없는토큰")
+      }
       return verify
     }catch(error){
       throw new UnauthorizedException("만료된거나 없는토큰")

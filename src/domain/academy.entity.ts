@@ -42,7 +42,7 @@
     sns: string[];
 
     @Column({name : "img", type : "longtext", nullable : true})
-    img
+    img : string
 
     @ManyToOne(()=>User,(user)=>user.userId,{onDelete : "CASCADE"})
     userId : User | string

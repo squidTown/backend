@@ -13,15 +13,21 @@ export class ReviewController {
     return await this.reviewService.create(createReviewDto,req,res);
   }
 
-  @Get(":id")
-  async findAll(@Param('id') id: string,@Req() req : Request, @Res() res : Response) {
-    return await this.reviewService.findOne(id,req,res);
-  } 
+  
+  @Get('/findmy')
+  async findmy(@Req() req : Request, @Res() res : Response) {
+    return await this.reviewService.findmy(req,res);
+  }
   
   @Get('findAll/:id')
   async findOne(@Param('id') id: string,@Req() req : Request, @Res() res : Response) {
     return await this.reviewService.findAll(id,req,res);
   }
+
+  @Get(":id")
+  async findAll(@Param('id') id: string,@Req() req : Request, @Res() res : Response) {
+    return await this.reviewService.findOne(id,req,res);
+  } 
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto,@Req() req : Request, @Res() res : Response) {

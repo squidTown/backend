@@ -24,9 +24,19 @@ export class AcademyController {
     await this.academyService.imgSave(file,id,req,res)
   }
 
+  @Get("/findAcademy")
+  async test(@Res() res : Response,@Req() req : Request) {
+    return this.academyService.findAcademiesWithinRadius(req,res);
+  }
+
   @Get("/findall")
   findAll(@Req() req : Request, @Res() res : Response) {
     return this.academyService.findAll(req,res);
+  }
+  
+  @Get("/findmy")
+  findmy(@Req() req : Request, @Res() res : Response) {
+    return this.academyService.findmy(req,res);
   }
 
   @Get(':id')//상세보기페이지

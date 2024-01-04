@@ -11,6 +11,7 @@ import { TutoringModule } from './tutoring/tutoring.module';
 import { Tutoring } from './domain/tutoring.entity';
 import { AcademyModule } from './academy/academy.module';
 import { ReviewModule } from './review/review.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [UserModule,
@@ -22,8 +23,11 @@ import { ReviewModule } from './review/review.module';
       signOptions : {expiresIn : "3000s"}}),
     TutoringModule,
     AcademyModule,
-    ReviewModule
+    ReviewModule,
+    ChatModule,
+    
   ],
+  providers: [],
 
 })
 export class AppModule {/*

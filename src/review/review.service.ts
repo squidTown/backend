@@ -7,6 +7,7 @@ import { Review } from 'src/domain/review.entity';
 import { Repository } from 'typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { Academy } from 'src/domain/academy.entity';
+import { Tutoring } from 'src/domain/tutoring.entity';
 
 @Injectable()
 export class ReviewService {
@@ -18,6 +19,9 @@ export class ReviewService {
     @InjectRepository(Academy)
     private academy : Repository<Academy>,
     
+    @InjectRepository(Tutoring)
+    private tutoring : Repository<Tutoring>,
+    
     private authService : AuthService
   ){}
 
@@ -25,7 +29,8 @@ export class ReviewService {
     const verify = await this.authService.verify2(req)
     try{
       const aData = await this.academy.findOne({where : {academyId : createReviewDto.PostId}})
-      if(!aData){
+      const tData = await this.tutoring.findOne({where : {postId : createReviewDto.PostId}})
+      if(!aData&&!tData){
         return res.status(400).json({
           message : "존재하지않는게시물"
         })
@@ -36,6 +41,7 @@ export class ReviewService {
       const data = await this.review.save(createReviewDto)
       return res.status(200).json({message :"OK"})
     }catch(error){
+      console.log(error)
       return res.status(500).json({message : "ise"})
     }
   }
@@ -95,6 +101,17 @@ export class ReviewService {
       await this.review.remove(data);
       return res.status(200).json({message : "ok"})
     }catch(error){
+      return res.status(500).json({message : "ise"})
+    }
+  }
+
+  async findmy(req : Request, res : Response){
+    const verify = await this.authService.verify2(req)
+    try{
+      const data = await this.review.find({where : {userId : verify.uuid},})
+      return res.status(200).json({message : "ok", data : data})
+    }catch(error){
+      console.log(error)
       return res.status(500).json({message : "ise"})
     }
   }

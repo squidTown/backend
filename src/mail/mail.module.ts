@@ -6,9 +6,10 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Mail } from 'src/domain/mail.entity';
 import { ScheduleModule } from '@nestjs/schedule';
+import { User } from 'src/domain/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Mail]),ScheduleModule.forRoot(),
+  imports: [TypeOrmModule.forFeature([Mail,User]),ScheduleModule.forRoot(),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',

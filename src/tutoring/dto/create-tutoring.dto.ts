@@ -22,10 +22,10 @@ export class CreateTutoringDto {
   @IsString()
   introduction :string
 
-  @IsString()
+  @IsNumber()
   latitude : number;
 
-  @IsString()
+  @IsNumber()
   longitude : number;
 
   @IsString()

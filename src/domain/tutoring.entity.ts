@@ -9,7 +9,7 @@ export class Tutoring {
   @Column({ type: 'varchar', length: '225', name: 'name'})//유저이름
   name: string;
 
-  @Column({type : "text", name : "img"})
+  @Column({type : "longtext", name : "img",nullable : true})
   img : string;
 
   @Column({type : "text", name : "introduction"})
